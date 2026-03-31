@@ -32,6 +32,28 @@ use Illuminate\Support\Facades\Route;
 Route::get('/robots.txt', RobotsController::class)->name('robots');
 Route::get('/sitemap.xml', SitemapController::class)->name('sitemap');
 
+Route::redirect('/index.php', '/', 301);
+Route::redirect('/default.php', '/', 301);
+Route::redirect('/about.php', '/about-ph-haiyan', 301);
+Route::redirect('/wedo.php', '/what-we-do', 301);
+Route::redirect('/gallery.php', '/gallery', 301);
+Route::redirect('/forums.php', '/forums', 301);
+Route::redirect('/letters.php', '/letters', 301);
+Route::redirect('/blog.php', '/news', 301);
+Route::redirect('/news.php', '/news', 301);
+Route::redirect('/events.php', '/events', 301);
+Route::redirect('/contact.php', '/contact', 301);
+Route::redirect('/donate.php', '/support-the-mission', 301);
+Route::redirect('/activities.php', '/#recent-activities', 301);
+Route::redirect('/article-repeal.php', '/letters/request-presidential-intervention-repeal-dpwh-do-73', 301);
+Route::redirect('/article-flood-letter.php', '/letters/from-warnings-to-flooding-documented-timeline', 301);
+Route::redirect('/article-lmwd.php', '/letters/request-clarification-primewater-concession-arrangement', 301);
+Route::redirect('/article-airport-letter.php', '/letters/inquiry-maintenance-landscaping-access-road-new-tacloban-terminal', 301);
+Route::redirect('/article-Water-Accountability.php', '/letters/water-accountability-in-tacloban', 301);
+Route::redirect('/article-waste-management.php', '/letters/calls-for-immediate-action-accountability-solid-waste-laws', 301);
+Route::redirect('/article-dpwh-fruit-trees.php', '/letters/proposal-fruit-bearing-trees-tacloban-national-roads', 301);
+Route::redirect('/article-appeal.php', '/letters/appeal-withdrawal-dpwh-do-73-series-2014', 301);
+
 Route::get('/', HomeController::class)->name('home');
 Route::get('/about-ph-haiyan', AboutController::class)->name('about');
 Route::get('/what-we-do', WhatWeDoController::class)->name('what-we-do');
