@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AboutController;
 use App\Http\Controllers\Admin\AuthController as AdminAuthController;
+use App\Http\Controllers\Admin\AnalyticsController as AdminAnalyticsController;
 use App\Http\Controllers\Admin\ContactMessageController as AdminContactMessageController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\EventEditorController as AdminEventEditorController;
@@ -81,6 +82,8 @@ Route::prefix('admin')->name('admin.')->group(function (): void {
 
     Route::middleware(['auth', 'admin'])->group(function (): void {
         Route::get('/', AdminDashboardController::class)->name('dashboard');
+        Route::get('/analytics', AdminAnalyticsController::class)->name('analytics.index');
+        Route::get('/analytics/export', [AdminAnalyticsController::class, 'export'])->name('analytics.export');
         Route::post('/logout', [AdminAuthController::class, 'destroy'])->name('logout');
         Route::get('/password', [AdminAuthController::class, 'editPassword'])->name('password.edit');
         Route::put('/password', [AdminAuthController::class, 'updatePassword'])->name('password.update');

@@ -163,6 +163,21 @@
                 <path d="m5 17 4.5-4.5 3.5 3.5 2.5-2.5 3.5 3.5" />
             </svg>
             @break
+        @case('chart')
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="h-full w-full">
+                <path d="M4 19h16" />
+                <path d="M7 16V9" />
+                <path d="M12 16V5" />
+                <path d="M17 16v-4" />
+            </svg>
+            @break
+        @case('download')
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="h-full w-full">
+                <path d="M12 4v10" />
+                <path d="m8 10 4 4 4-4" />
+                <path d="M5 20h14" />
+            </svg>
+            @break
         @case('arrow-up-right')
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="h-full w-full">
                 <path d="M7 17 17 7" />

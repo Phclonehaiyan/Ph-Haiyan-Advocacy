@@ -34,6 +34,10 @@
                             <span>Dashboard</span>
                             <x-icon name="spark" class="h-4 w-4" />
                         </a>
+                        <a href="{{ route('admin.analytics.index') }}" class="flex items-center justify-between rounded-2xl px-3 py-2.5 transition {{ request()->routeIs('admin.analytics.*') ? 'bg-white/12 text-white shadow-soft' : 'text-white/75 hover:bg-white/6 hover:text-white' }}">
+                            <span>Analytics</span>
+                            <x-icon name="chart" class="h-4 w-4" />
+                        </a>
                         <a href="{{ route('admin.settings.edit') }}" class="flex items-center justify-between rounded-2xl px-3 py-2.5 transition {{ request()->routeIs('admin.settings.*') ? 'bg-white/12 text-white shadow-soft' : 'text-white/75 hover:bg-white/6 hover:text-white' }}">
                             <span>Site Settings</span>
                             <x-icon name="settings" class="h-4 w-4" />

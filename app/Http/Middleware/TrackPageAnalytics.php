@@ -34,6 +34,7 @@ class TrackPageAnalytics
         }
 
         $visitorKey = (string) ($request->cookie(self::VISITOR_COOKIE) ?: Str::uuid());
+        $path = '/'.ltrim($request->path(), '/');
 
         if (! $request->hasCookie(self::VISITOR_COOKIE)) {
             $response->headers->setCookie(
@@ -41,10 +42,22 @@ class TrackPageAnalytics
             );
         }
 
+        $duplicateWindow = now()->subSeconds(30);
+
+        $alreadyTracked = PageView::query()
+            ->where('visitor_key', $visitorKey)
+            ->where('path', $path)
+            ->where('viewed_at', '>=', $duplicateWindow)
+            ->exists();
+
+        if ($alreadyTracked) {
+            return $response;
+        }
+
         PageView::query()->create([
             'visitor_key' => $visitorKey,
             'session_id' => $request->session()->getId(),
-            'path' => '/'.ltrim($request->path(), '/'),
+            'path' => $path,
             'route_name' => $request->route()?->getName(),
             'page_label' => $this->resolvePageLabel($request),
             'referrer_host' => $this->resolveReferrerHost($request),

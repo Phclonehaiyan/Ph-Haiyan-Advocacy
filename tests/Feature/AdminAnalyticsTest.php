@@ -68,4 +68,35 @@ class AdminAnalyticsTest extends TestCase
             ->assertSee('Most Visited Pages')
             ->assertSee('Real-Time');
     }
+
+    public function test_admin_analytics_page_and_export_are_available(): void
+    {
+        PageView::query()->create([
+            'visitor_key' => 'visitor-2',
+            'session_id' => 'session-2',
+            'path' => '/news',
+            'route_name' => 'news.index',
+            'page_label' => 'News',
+            'referrer_host' => 'google.com',
+            'device_type' => 'Mobile',
+            'ip_hash' => str_repeat('b', 64),
+            'user_agent' => 'Mozilla/5.0',
+            'viewed_at' => now(),
+        ]);
+
+        $admin = User::factory()->create([
+            'is_admin' => true,
+        ]);
+
+        $this->actingAs($admin)
+            ->get(route('admin.analytics.index', ['days' => 7]))
+            ->assertOk()
+            ->assertSee('Visitor Intelligence')
+            ->assertSee('Export CSV');
+
+        $this->actingAs($admin)
+            ->get(route('admin.analytics.export', ['days' => 7]))
+            ->assertOk()
+            ->assertHeader('content-type', 'text/csv; charset=utf-8');
+    }
 }

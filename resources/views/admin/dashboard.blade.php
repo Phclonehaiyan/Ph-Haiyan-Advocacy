@@ -42,8 +42,16 @@
 
     <section class="mt-8 grid gap-6 xl:grid-cols-[minmax(0,1.2fr)_minmax(0,0.8fr)]">
         <div class="admin-panel">
-            <div class="admin-kicker">Traffic Trend</div>
-            <h2 class="admin-heading mt-2">Page views and unique visitors for the last 14 days.</h2>
+            <div class="flex items-center justify-between gap-4">
+                <div>
+                    <div class="admin-kicker">Traffic Trend</div>
+                    <h2 class="admin-heading mt-2">Page views and unique visitors for the last 14 days.</h2>
+                </div>
+                <a href="{{ route('admin.analytics.index') }}" class="btn-secondary !px-4 !py-2">
+                    <x-icon name="chart" class="h-4 w-4" />
+                    Open analytics
+                </a>
+            </div>
             <div class="mt-6 space-y-4">
                 @foreach ($analyticsTrend as $day)
                     <div class="grid gap-3 sm:grid-cols-[72px_minmax(0,1fr)_auto] sm:items-center">
