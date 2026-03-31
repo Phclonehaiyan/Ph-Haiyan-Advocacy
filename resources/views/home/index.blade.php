@@ -1,4 +1,11 @@
-@extends('layouts.app', ['pageTitle' => $page->meta_title, 'pageDescription' => $page->meta_description])
+@extends('layouts.app', [
+    'pageTitle' => $page->meta_title,
+    'pageDescription' => $page->meta_description,
+    'seo' => [
+        'image' => $featuredNews?->og_image ?: $featuredNews?->image ?: $page->hero_image,
+        'type' => 'website',
+    ],
+])
 
 @section('content')
     @php
