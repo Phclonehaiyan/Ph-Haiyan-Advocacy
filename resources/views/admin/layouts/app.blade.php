@@ -16,7 +16,7 @@
         <link rel="apple-touch-icon" href="{{ asset('images/brand/ph-haiyan-logo.png') }}">
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
-    <body class="admin-shell min-h-screen text-slate-900 antialiased">
+    <body x-data="{ mobileAdminNavOpen: false }" class="admin-shell min-h-screen text-slate-900 antialiased">
         <div class="flex min-h-screen">
             <aside class="admin-sidebar hidden w-72 px-6 py-8 lg:block">
                 <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-3">
@@ -114,12 +114,160 @@
                 </nav>
             </aside>
 
+            <div
+                x-cloak
+                x-show="mobileAdminNavOpen"
+                class="fixed inset-0 z-40 bg-slate-950/45 backdrop-blur-sm lg:hidden"
+                @click="mobileAdminNavOpen = false"
+            ></div>
+
+            <aside
+                x-cloak
+                x-show="mobileAdminNavOpen"
+                x-transition:enter="transition ease-out duration-200"
+                x-transition:enter-start="-translate-x-full opacity-0"
+                x-transition:enter-end="translate-x-0 opacity-100"
+                x-transition:leave="transition ease-in duration-150"
+                x-transition:leave-start="translate-x-0 opacity-100"
+                x-transition:leave-end="-translate-x-full opacity-0"
+                class="admin-sidebar fixed inset-y-0 left-0 z-50 w-[88vw] max-w-sm overflow-y-auto px-5 py-6 lg:hidden"
+            >
+                <div class="flex items-center justify-between gap-4">
+                    <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-3" @click="mobileAdminNavOpen = false">
+                        <img src="{{ asset('images/brand/ph-haiyan-logo.png') }}" alt="PH Haiyan" class="h-10 w-auto">
+                        <div>
+                            <div class="font-display text-lg font-semibold text-white">PH Haiyan Admin</div>
+                            <div class="text-[11px] uppercase tracking-[0.26em] text-white/55">Mobile Navigation</div>
+                        </div>
+                    </a>
+
+                    <button
+                        type="button"
+                        class="inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/15 bg-white/10 text-white transition hover:bg-white/15"
+                        @click="mobileAdminNavOpen = false"
+                        aria-label="Close admin navigation"
+                    >
+                        <x-icon name="close" class="h-5 w-5" />
+                    </button>
+                </div>
+
+                <div class="mt-6 rounded-2xl border border-white/10 bg-white/5 px-4 py-4 text-sm text-white/70">
+                    <div class="font-medium text-white">{{ auth()->user()->name }}</div>
+                    <div class="mt-1 break-all text-white/60">{{ auth()->user()->email }}</div>
+                </div>
+
+                <nav class="mt-8 space-y-8 text-sm">
+                    <div class="space-y-2">
+                        <div class="px-3 text-xs font-semibold uppercase tracking-[0.26em] text-white/45">Overview</div>
+                        <a href="{{ route('admin.dashboard') }}" class="flex items-center justify-between rounded-2xl px-3 py-3 transition {{ request()->routeIs('admin.dashboard') ? 'bg-white/12 text-white shadow-soft' : 'text-white/75 hover:bg-white/6 hover:text-white' }}" @click="mobileAdminNavOpen = false">
+                            <span>Dashboard</span>
+                            <x-icon name="spark" class="h-4 w-4" />
+                        </a>
+                        <a href="{{ route('admin.analytics.index') }}" class="flex items-center justify-between rounded-2xl px-3 py-3 transition {{ request()->routeIs('admin.analytics.*') ? 'bg-white/12 text-white shadow-soft' : 'text-white/75 hover:bg-white/6 hover:text-white' }}" @click="mobileAdminNavOpen = false">
+                            <span>Analytics</span>
+                            <x-icon name="chart" class="h-4 w-4" />
+                        </a>
+                        <a href="{{ route('admin.settings.edit') }}" class="flex items-center justify-between rounded-2xl px-3 py-3 transition {{ request()->routeIs('admin.settings.*') ? 'bg-white/12 text-white shadow-soft' : 'text-white/75 hover:bg-white/6 hover:text-white' }}" @click="mobileAdminNavOpen = false">
+                            <span>Site Settings</span>
+                            <x-icon name="settings" class="h-4 w-4" />
+                        </a>
+                        <a href="{{ route('admin.messages.index') }}" class="flex items-center justify-between rounded-2xl px-3 py-3 transition {{ request()->routeIs('admin.messages.*') ? 'bg-white/12 text-white shadow-soft' : 'text-white/75 hover:bg-white/6 hover:text-white' }}" @click="mobileAdminNavOpen = false">
+                            <span>Contact Messages</span>
+                            <x-icon name="mail" class="h-4 w-4" />
+                        </a>
+                        <a href="{{ route('admin.password.edit') }}" class="flex items-center justify-between rounded-2xl px-3 py-3 transition {{ request()->routeIs('admin.password.*') ? 'bg-white/12 text-white shadow-soft' : 'text-white/75 hover:bg-white/6 hover:text-white' }}" @click="mobileAdminNavOpen = false">
+                            <span>Change Password</span>
+                            <x-icon name="shield" class="h-4 w-4" />
+                        </a>
+                    </div>
+
+                    <div class="space-y-2">
+                        <div class="px-3 text-xs font-semibold uppercase tracking-[0.26em] text-white/45">Page Editors</div>
+                        @foreach ([
+                            'home' => 'Home Page',
+                            'about' => 'About Page',
+                            'what-we-do' => 'What We Do Page',
+                        ] as $pageEditorKey => $pageEditorLabel)
+                            <a href="{{ route('admin.page-editors.edit', $pageEditorKey) }}" class="flex items-center justify-between rounded-2xl px-3 py-3 transition {{ request()->routeIs('admin.page-editors.*') && request()->route('pageKey') === $pageEditorKey ? 'bg-white/12 text-white shadow-soft' : 'text-white/75 hover:bg-white/6 hover:text-white' }}" @click="mobileAdminNavOpen = false">
+                                <span>{{ $pageEditorLabel }}</span>
+                                <x-icon name="edit" class="h-4 w-4" />
+                            </a>
+                        @endforeach
+                    </div>
+
+                    <div class="space-y-2">
+                        <div class="px-3 text-xs font-semibold uppercase tracking-[0.26em] text-white/45">Story Editors</div>
+                        <a href="{{ route('admin.news.index') }}" class="flex items-center justify-between rounded-2xl px-3 py-3 transition {{ request()->routeIs('admin.news.*') ? 'bg-white/12 text-white shadow-soft' : 'text-white/75 hover:bg-white/6 hover:text-white' }}" @click="mobileAdminNavOpen = false">
+                            <span>News Archive</span>
+                            <x-icon name="speaker" class="h-4 w-4" />
+                        </a>
+                        <a href="{{ route('admin.letters.index') }}" class="flex items-center justify-between rounded-2xl px-3 py-3 transition {{ request()->routeIs('admin.letters.*') ? 'bg-white/12 text-white shadow-soft' : 'text-white/75 hover:bg-white/6 hover:text-white' }}" @click="mobileAdminNavOpen = false">
+                            <span>Letters Archive</span>
+                            <x-icon name="mail" class="h-4 w-4" />
+                        </a>
+                    </div>
+
+                    <div class="space-y-2">
+                        <div class="px-3 text-xs font-semibold uppercase tracking-[0.26em] text-white/45">Archive Editors</div>
+                        <a href="{{ route('admin.projects.index') }}" class="flex items-center justify-between rounded-2xl px-3 py-3 transition {{ request()->routeIs('admin.projects.*') ? 'bg-white/12 text-white shadow-soft' : 'text-white/75 hover:bg-white/6 hover:text-white' }}" @click="mobileAdminNavOpen = false">
+                            <span>Projects Archive</span>
+                            <x-icon name="edit" class="h-4 w-4" />
+                        </a>
+                        <a href="{{ route('admin.forums.index') }}" class="flex items-center justify-between rounded-2xl px-3 py-3 transition {{ request()->routeIs('admin.forums.*') ? 'bg-white/12 text-white shadow-soft' : 'text-white/75 hover:bg-white/6 hover:text-white' }}" @click="mobileAdminNavOpen = false">
+                            <span>Forums Archive</span>
+                            <x-icon name="edit" class="h-4 w-4" />
+                        </a>
+                        <a href="{{ route('admin.events.index') }}" class="flex items-center justify-between rounded-2xl px-3 py-3 transition {{ request()->routeIs('admin.events.*') ? 'bg-white/12 text-white shadow-soft' : 'text-white/75 hover:bg-white/6 hover:text-white' }}" @click="mobileAdminNavOpen = false">
+                            <span>Events Archive</span>
+                            <x-icon name="calendar" class="h-4 w-4" />
+                        </a>
+                        <a href="{{ route('admin.gallery.index') }}" class="flex items-center justify-between rounded-2xl px-3 py-3 transition {{ request()->routeIs('admin.gallery.*') ? 'bg-white/12 text-white shadow-soft' : 'text-white/75 hover:bg-white/6 hover:text-white' }}" @click="mobileAdminNavOpen = false">
+                            <span>Gallery Archive</span>
+                            <x-icon name="image" class="h-4 w-4" />
+                        </a>
+                        <a href="{{ route('admin.videos.index') }}" class="flex items-center justify-between rounded-2xl px-3 py-3 transition {{ request()->routeIs('admin.videos.*') ? 'bg-white/12 text-white shadow-soft' : 'text-white/75 hover:bg-white/6 hover:text-white' }}" @click="mobileAdminNavOpen = false">
+                            <span>Video Stories</span>
+                            <x-icon name="play" class="h-4 w-4" />
+                        </a>
+                    </div>
+
+                    <div class="space-y-2">
+                        <div class="px-3 text-xs font-semibold uppercase tracking-[0.26em] text-white/45">Content</div>
+                        @foreach ($contentResources as $key => $resource)
+                            <a href="{{ route('admin.resources.index', $key) }}" class="flex items-center justify-between rounded-2xl px-3 py-3 transition {{ request()->routeIs('admin.resources.*') && request()->route('resource') === $key ? 'bg-white/12 text-white shadow-soft' : 'text-white/75 hover:bg-white/6 hover:text-white' }}" @click="mobileAdminNavOpen = false">
+                                <span>{{ $resource['label'] }}</span>
+                                <span class="text-[11px] uppercase tracking-[0.22em] text-white/40">{{ $resource['singular'] }}</span>
+                            </a>
+                        @endforeach
+                    </div>
+                </nav>
+
+                <form action="{{ route('admin.logout') }}" method="POST" class="mt-8">
+                    @csrf
+                    <button type="submit" class="inline-flex w-full items-center justify-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-3 text-sm font-medium text-white transition hover:bg-white/15">
+                        <x-icon name="logout" class="h-4 w-4" />
+                        Sign out
+                    </button>
+                </form>
+            </aside>
+
             <div class="flex-1">
                 <header class="border-b border-pine-900/10 bg-white/80 backdrop-blur">
                     <div class="mx-auto flex max-w-7xl items-center justify-between gap-4 px-5 py-4 sm:px-8">
-                        <div>
+                        <div class="flex items-center gap-3">
+                            <button
+                                type="button"
+                                class="inline-flex h-11 w-11 items-center justify-center rounded-full border border-pine-200 bg-white text-pine-900 transition hover:border-pine-300 hover:bg-pine-50 lg:hidden"
+                                @click="mobileAdminNavOpen = true"
+                                aria-label="Open admin navigation"
+                            >
+                                <x-icon name="menu" class="h-5 w-5" />
+                            </button>
+
+                            <div>
                             <div class="text-xs font-semibold uppercase tracking-[0.26em] text-pine-700/70">Administration</div>
                             <h1 class="mt-1 text-2xl font-semibold tracking-tight text-pine-950">{{ $pageTitle ?? 'Admin Dashboard' }}</h1>
+                            </div>
                         </div>
 
                         <div class="flex items-center gap-4">
