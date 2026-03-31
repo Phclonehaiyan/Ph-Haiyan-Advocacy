@@ -3,6 +3,7 @@
 @section('content')
     @php
         $fieldValue = fn (string $key) => old($key, $values[$key] ?? '');
+        $gallerySlots = range(0, 5);
     @endphp
 
     <form action="{{ $record ? route('admin.news.update', $record) : route('admin.news.store') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
@@ -125,6 +126,57 @@
                         <div class="mt-4 rounded-2xl border border-dashed border-slate-300 px-4 py-10 text-sm text-slate-500">No image selected yet.</div>
                     @endif
                 </div>
+            </div>
+        </section>
+
+        <section class="admin-panel">
+            <div class="admin-kicker">Article gallery</div>
+            <h3 class="admin-heading mt-2">Add up to 6 supporting images for the full story page.</h3>
+            <p class="admin-copy mt-3">Keep the preview image above for cards and social sharing. Use these slots for extra images inside the news article itself.</p>
+
+            <div class="mt-6 grid gap-6 2xl:grid-cols-2">
+                @foreach ($gallerySlots as $slot)
+                    @php
+                        $slotNumber = $slot + 1;
+                        $slotImage = old("gallery_images.$slot.image", data_get($values, "gallery_images.$slot.image"));
+                        $slotAlt = old("gallery_images.$slot.image_alt", data_get($values, "gallery_images.$slot.image_alt"));
+                    @endphp
+
+                    <div class="admin-panel-subtle flex h-full flex-col">
+                        <div class="flex items-center justify-between gap-4">
+                            <div>
+                                <div class="admin-kicker">Supporting image {{ $slotNumber }}</div>
+                                <div class="mt-2 text-sm text-slate-500">Optional story image, alt text, and caption.</div>
+                            </div>
+                            <div class="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">Slot {{ $slotNumber }}</div>
+                        </div>
+
+                        <div class="mt-5 flex flex-1 flex-col gap-5">
+                            <div class="overflow-hidden rounded-[24px] border border-slate-200 bg-white/90">
+                                @if ($slotImage)
+                                    <img src="{{ asset(ltrim((string) $slotImage, '/')) }}" alt="Supporting image {{ $slotNumber }} preview" class="h-52 w-full object-cover">
+                                @else
+                                    <div class="flex h-52 items-center justify-center px-4 text-center text-sm text-slate-500">No image saved in this slot yet.</div>
+                                @endif
+                            </div>
+
+                            <div>
+                                <label for="gallery_images_{{ $slot }}_image" class="admin-label">Image path</label>
+                                <input id="gallery_images_{{ $slot }}_image" name="gallery_images[{{ $slot }}][image]" type="text" value="{{ $slotImage }}" class="admin-input mt-2" placeholder="/uploads/...">
+                            </div>
+
+                            <div>
+                                <label for="gallery_uploads_{{ $slot }}" class="admin-label">Upload image</label>
+                                <input id="gallery_uploads_{{ $slot }}" name="gallery_uploads[{{ $slot }}]" type="file" class="mt-2 block w-full text-sm text-slate-600 file:mr-4 file:rounded-full file:border-0 file:bg-pine-950 file:px-4 file:py-2 file:text-sm file:font-medium file:text-white hover:file:bg-pine-900">
+                            </div>
+
+                            <div>
+                                <label for="gallery_images_{{ $slot }}_image_alt" class="admin-label">Alt text</label>
+                                <input id="gallery_images_{{ $slot }}_image_alt" name="gallery_images[{{ $slot }}][image_alt]" type="text" value="{{ $slotAlt }}" class="admin-input mt-2" placeholder="Describe the image naturally">
+                            </div>
+                        </div>
+                    </div>
+                @endforeach
             </div>
         </section>
     </form>

@@ -49,6 +49,7 @@ class NewsEditorController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $record = NewsPost::query()->create($this->payload($request));
+        $this->syncGalleryImages($request, $record);
 
         return redirect()
             ->route('admin.news.edit', $record)
@@ -66,6 +67,7 @@ class NewsEditorController extends Controller
     public function update(Request $request, NewsPost $newsPost): RedirectResponse
     {
         $newsPost->update($this->payload($request, $newsPost));
+        $this->syncGalleryImages($request, $newsPost);
 
         return redirect()
             ->route('admin.news.edit', $newsPost)
@@ -83,6 +85,20 @@ class NewsEditorController extends Controller
 
     private function values(?NewsPost $record = null): array
     {
+        $existingGalleryImages = $record?->galleryImages()->orderBy('sort_order')->get()->values() ?? collect();
+
+        $galleryImages = collect(range(0, 5))
+            ->map(function (int $slot) use ($existingGalleryImages): array {
+                $item = $existingGalleryImages->get($slot);
+
+                return [
+                    'image' => $item?->image,
+                    'image_alt' => $item?->image_alt,
+                    'caption' => $item?->caption,
+                ];
+            })
+            ->all();
+
         return [
             'title' => $record?->title,
             'slug' => $record?->slug,
@@ -98,6 +114,7 @@ class NewsEditorController extends Controller
             'is_featured' => (bool) $record?->is_featured,
             'is_published' => $record ? (bool) $record->is_published : true,
             'published_at' => $record?->published_at?->format('Y-m-d\TH:i'),
+            'gallery_images' => $galleryImages,
         ];
     }
 
@@ -116,6 +133,12 @@ class NewsEditorController extends Controller
             'og_image' => ['nullable', 'string', 'max:2048'],
             'og_image_upload' => ['nullable', 'image', 'max:5120'],
             'image_upload' => ['nullable', 'image', 'max:5120'],
+            'gallery_images' => ['nullable', 'array', 'max:6'],
+            'gallery_images.*.image' => ['nullable', 'string', 'max:2048'],
+            'gallery_images.*.image_alt' => ['nullable', 'string', 'max:255'],
+            'gallery_images.*.caption' => ['nullable', 'string', 'max:255'],
+            'gallery_uploads' => ['nullable', 'array', 'max:6'],
+            'gallery_uploads.*' => ['nullable', 'image', 'max:5120'],
             'reading_time' => ['nullable', 'integer', 'min:1'],
             'published_at' => ['nullable', 'date'],
         ]);
@@ -145,11 +168,45 @@ class NewsEditorController extends Controller
                 'og-image',
                 trim((string) ($validated['og_image'] ?? '')) ?: $record?->og_image
             ),
-            'reading_time' => $validated['reading_time'] ?? null,
+            'reading_time' => $validated['reading_time'] ?? $record?->reading_time ?? 3,
             'is_featured' => $request->boolean('is_featured'),
             'is_published' => $request->boolean('is_published'),
             'published_at' => $validated['published_at'] ?? null,
         ];
+    }
+
+    private function syncGalleryImages(Request $request, NewsPost $record): void
+    {
+        $galleryInput = $request->input('gallery_images', []);
+        $galleryFiles = $request->file('gallery_uploads', []);
+        $galleryItems = [];
+
+        foreach (range(0, 5) as $slot) {
+            $slotData = $galleryInput[$slot] ?? [];
+            $storedImage = $this->storeAsset(
+                $galleryFiles[$slot] ?? null,
+                'news',
+                'gallery',
+                trim((string) ($slotData['image'] ?? '')) ?: null
+            );
+
+            if (! filled($storedImage)) {
+                continue;
+            }
+
+            $galleryItems[] = [
+                'image' => $storedImage,
+                'image_alt' => trim((string) ($slotData['image_alt'] ?? '')) ?: null,
+                'caption' => trim((string) ($slotData['caption'] ?? '')) ?: null,
+                'sort_order' => $slot,
+            ];
+        }
+
+        $record->galleryImages()->delete();
+
+        if ($galleryItems !== []) {
+            $record->galleryImages()->createMany($galleryItems);
+        }
     }
 
     private function uniqueSlug(string $provided, string $title, ?int $ignoreId = null): string

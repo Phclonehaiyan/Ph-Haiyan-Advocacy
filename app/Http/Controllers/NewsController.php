@@ -44,6 +44,8 @@ class NewsController extends Controller
 
     public function show(NewsPost $newsPost): View
     {
+        $newsPost->load('galleryImages');
+
         abort_unless(
             $newsPost->is_published && ($newsPost->published_at === null || $newsPost->published_at->lte(now())),
             404
