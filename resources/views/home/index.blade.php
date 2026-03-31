@@ -55,7 +55,13 @@
                 </div>
 
                 @if (! empty($content['hero_chips']))
-                    <div class="mt-8 flex flex-wrap items-center gap-x-5 gap-y-3 text-sm font-semibold uppercase tracking-[0.34em] text-white [text-shadow:0_3px_12px_rgba(0,0,0,0.28)] sm:text-base">
+                    <div class="mt-8 grid grid-cols-3 items-center gap-x-3 text-[0.72rem] font-semibold uppercase tracking-[0.26em] text-white [text-shadow:0_3px_12px_rgba(0,0,0,0.28)] sm:hidden">
+                        @foreach ($content['hero_chips'] as $chip)
+                            <span class="text-center">{{ strtoupper($chip) }}</span>
+                        @endforeach
+                    </div>
+
+                    <div class="mt-8 hidden flex-wrap items-center gap-x-5 gap-y-3 text-sm font-semibold uppercase tracking-[0.34em] text-white [text-shadow:0_3px_12px_rgba(0,0,0,0.28)] sm:flex sm:text-base">
                         @foreach ($content['hero_chips'] as $chip)
                             <span>{{ strtoupper($chip) }}</span>
                             @if (! $loop->last)
