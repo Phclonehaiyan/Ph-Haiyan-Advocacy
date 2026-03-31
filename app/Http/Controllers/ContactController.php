@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreContactMessageRequest;
+use App\Mail\ContactMessageConfirmation;
 use App\Mail\ContactMessageReceived;
 use App\Models\ContactMessage;
 use App\Models\Page;
@@ -38,6 +39,7 @@ class ContactController extends Controller
 
         try {
             Mail::to(config('site.contact.email'))->send(new ContactMessageReceived($contactMessage));
+            Mail::to($contactMessage->email)->send(new ContactMessageConfirmation($contactMessage));
         } catch (\Throwable $exception) {
             Log::error('Contact message email notification failed.', [
                 'contact_message_id' => $contactMessage->id,
